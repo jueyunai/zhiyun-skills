@@ -180,8 +180,7 @@ AI Agent 赛道表现怎么样？Manus 和 Devin 谁更强？
 ### 相关资源
 
 Skill 内包含的参考文档：
-- `traffic-analyzer/references/analysis_methodology.md`: 详细的分析方法论
-- `traffic-analyzer/references/common_scenarios.md`: 常见使用场景和案例
+- `traffic-analyzer/references/guide.md`: 完整参考指南（分析方法论、常见场景、最佳实践）
 
 ### 学习路径
 
@@ -214,7 +213,7 @@ zhiyun-skills/
 └── traffic-analyzer/
     ├── SKILL.md          # Claude 读取的技能文档
     ├── scripts/          # Python 脚本
-    ├── templates/        # 报告模板
+    ├── assets/           # 报告模板
     └── references/       # 参考文档
 ```
 

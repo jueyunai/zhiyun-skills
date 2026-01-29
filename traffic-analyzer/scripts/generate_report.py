@@ -31,7 +31,7 @@ sns.set_style("whitegrid")
 # 脚本所在目录
 SCRIPT_DIR = Path(__file__).parent.absolute()
 SKILL_DIR = SCRIPT_DIR.parent
-TEMPLATE_DIR = SKILL_DIR / "templates"
+TEMPLATE_DIR = SKILL_DIR / "assets"
 
 
 class TrafficAnalyzer:
