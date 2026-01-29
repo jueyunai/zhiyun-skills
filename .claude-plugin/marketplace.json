@@ -1,0 +1,22 @@
+{
+  "name": "zhiyun-skills",
+  "owner": {
+    "name": "Zhiyun Lee",
+    "email": "zhiyun.lee@example.com"
+  },
+  "metadata": {
+    "description": "志云的 Claude Skills 集合，提供流量分析和市场洞察工具",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "traffic-analyzer",
+      "description": "网站流量分析和市场洞察工具，从 SEMrush/SimilarWeb 数据中发现商业机会",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./traffic-analyzer"
+      ]
+    }
+  ]
+}
