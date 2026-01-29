@@ -9,6 +9,7 @@ __pycache__/
 outputs/
 *.pdf
 *.html
+!**/templates/*.html
 
 # 环境配置
 .env

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+            @top-center {
+                content: "{{ report_title }}";
+                font-size: 10px;
+                color: #666;
+            }
+            @bottom-center {
+                content: "第 " counter(page) " 页";
+                font-size: 10px;
+                color: #666;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        /* 封面 - 艾瑞/艾媒风格 */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            color: #333;
+            page-break-after: always;
+            padding: 50px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 几何装饰 - 右下角三角形 */
+        .cover-geo {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 45%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .geo-shape-1 {
+            position: absolute;
+            bottom: 0;
+            right: -5%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 420px 650px;
+            border-color: transparent transparent #3b82f6 transparent;
+            opacity: 0.9;
+        }
+
+        .geo-shape-2 {
+            position: absolute;
+            bottom: 0;
+            right: 15%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 320px 500px;
+            border-color: transparent transparent #60a5fa transparent;
+            opacity: 0.8;
+        }
+
+        .geo-shape-3 {
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 250px 400px;
+            border-color: transparent transparent #93c5fd transparent;
+            opacity: 0.7;
+        }
+
+        /* 顶部机构信息 */
+        .cover-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 30px;
+            z-index: 1;
+        }
+
+        .cover-header .logo-area {
+            text-align: right;
+        }
+
+        .cover-header .institution {
+            font-size: 22pt;
+            font-weight: 700;
+            color: #3b82f6;
+            letter-spacing: 2px;
+        }
+
+        .cover-header .institution-sub {
+            font-size: 10pt;
+            color: #64748b;
+            letter-spacing: 3px;
+            margin-top: 4px;
+        }
+
+        /* 主标题区 */
+        .cover-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 20px;
+            z-index: 1;
+        }
+
+        .cover h1 {
+            font-size: 42pt;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: 2px;
+        }
+
+        .cover-subtitle {
+            margin-top: 30px;
+            padding-left: 5px;
+        }
+
+        .cover-subtitle .tagline {
+            font-size: 14pt;
+            color: #64748b;
+            line-height: 1.8;
+        }
+
+        .cover-subtitle .tagline-highlight {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        /* 底部元数据 */
+        .cover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 1;
+            padding-bottom: 20px;
+        }
+
+        .cover-meta {
+            font-size: 11pt;
+            color: #64748b;
+            line-height: 1.8;
+        }
+
+        .cover-meta .meta-line {
+            display: flex;
+            gap: 30px;
+        }
+
+        .cover-meta .label {
+            color: #94a3b8;
+        }
+
+        .cover-copyright {
+            font-size: 10pt;
+            color: #94a3b8;
+        }
+
+        /* 内容区 */
+        .content {
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-size: 20pt;
+            color: #1a365d;
+            border-bottom: 3px solid #3182ce;
+            padding-bottom: 10px;
+            margin: 30px 0 20px 0;
+        }
+
+        h2 {
+            font-size: 14pt;
+            color: #2c5282;
+            margin: 25px 0 15px 0;
+            padding-left: 10px;
+            border-left: 4px solid #3182ce;
+        }
+
+        h3 {
+            font-size: 12pt;
+            color: #4a5568;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+
+        /* 摘要框 */
+        .summary-box {
+            background: #ebf8ff;
+            border: 1px solid #90cdf4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-box h3 {
+            color: #2b6cb0;
+            margin-top: 0;
+        }
+
+        /* 核心指标卡片 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-card .value {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #2c5282;
+        }
+
+        .metric-card .label {
+            font-size: 9pt;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .metric-card .change {
+            font-size: 10pt;
+            margin-top: 5px;
+        }
+
+        .metric-card .change.up { color: #38a169; }
+        .metric-card .change.down { color: #e53e3e; }
+
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+        }
+
+        th {
+            background: #2c5282;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        tr:hover {
+            background: #ebf8ff;
+        }
+
+        tr.highlight {
+            background: #c6f6d5;
+        }
+
+        /* 评级标签 */
+        .rating {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: 600;
+        }
+
+        .rating.s { background: #c6f6d5; color: #22543d; }
+        .rating.a { background: #feebc8; color: #744210; }
+        .rating.b { background: #e2e8f0; color: #4a5568; }
+        .rating.risk { background: #fed7d7; color: #742a2a; }
+
+        /* 增长标签 */
+        .growth {
+            font-weight: 600;
+        }
+        .growth.positive { color: #38a169; }
+        .growth.negative { color: #e53e3e; }
+
+        /* 图表容器 */
+        .chart-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container .caption {
+            font-size: 9pt;
+            color: #718096;
+            margin-top: 8px;
+        }
+
+        /* 要点列表 */
+        .key-points {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .key-points li {
+            margin: 8px 0;
+        }
+
+        /* 风险提示 */
+        .risk-warning {
+            background: #fff5f5;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .risk-warning h4 {
+            color: #c53030;
+            margin-bottom: 10px;
+        }
+
+        /* 推荐框 */
+        .recommendation {
+            background: linear-gradient(135deg, #ebf8ff 0%, #e6fffa 100%);
+            border: 2px solid #3182ce;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .recommendation h3 {
+            color: #2c5282;
+            margin-top: 0;
+        }
+
+        /* 免责声明 */
+        .disclaimer {
+            font-size: 9pt;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            margin-top: 40px;
+        }
+
+        /* 分页控制 */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* 代码块样式 */
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: "SF Mono", Consolas, monospace;
+            font-size: 9pt;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 封面 -->
+    <div class="cover">
+        <!-- 几何装饰背景 -->
+        <div class="cover-geo">
+            <div class="geo-shape-1"></div>
+            <div class="geo-shape-2"></div>
+            <div class="geo-shape-3"></div>
+        </div>
+
+        <!-- 顶部机构 Logo -->
+        <div class="cover-header">
+            <div class="logo-area">
+                <div class="institution">{{ institution_name }}</div>
+                <div class="institution-sub">{{ institution_name_en }}</div>
+            </div>
+        </div>
+
+        <!-- 主标题区 -->
+        <div class="cover-main">
+            <h1>{{ cover_title }}</h1>
+            <div class="cover-subtitle">
+                <div class="tagline">
+                    {{ cover_tagline_1 }}<br>
+                    <span class="tagline-highlight">{{ cover_highlight }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部元数据 -->
+        <div class="cover-footer">
+            <div class="cover-meta">
+                <div class="meta-line">
+                    <span><span class="label">数据来源：</span>{{ data_source }}</span>
+                    <span><span class="label">分析标的：</span>{{ analysis_target }}</span>
+                </div>
+                <div class="meta-line">
+                    <span><span class="label">数据周期：</span>{{ data_period }}</span>
+                    <span><span class="label">报告编号：</span>{{ report_id }}</span>
+                </div>
+            </div>
+            <div class="cover-copyright">©{{ report_year }} {{ institution_name }}</div>
+        </div>
+    </div>
+
+    <!-- 核心摘要 -->
+    <div class="content">
+        <h1>核心摘要</h1>
+
+        <div class="metrics-grid">
+            {% for metric in core_metrics %}
+            <div class="metric-card">
+                <div class="value">{{ metric.value }}</div>
+                <div class="label">{{ metric.label }}</div>
+                {% if metric.change %}
+                <div class="change {{ metric.change_class }}">{{ metric.change }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="summary-box">
+            <h3>核心观点</h3>
+            <ol>
+                {% for point in core_points %}
+                <li><strong>{{ point.title }}</strong>{{ point.description }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <div class="page-break"></div>
+
+        <h1>一、市场全景分析</h1>
+
+        <h2>1.1 流量结构分布</h2>
+
+        {% if charts.traffic_distribution %}
+        <div class="chart-container">
+            <img src="{{ charts.traffic_distribution }}" alt="流量类型分布">
+            <div class="caption">图1：流量类型分布</div>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>流量类型</th>
+                    <th>流量规模</th>
+                    <th>占比</th>
+                    <th>来源数量</th>
+                    <th>分析</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in traffic_by_type %}
+                <tr>
+                    <td>{{ row.type }}</td>
+                    <td>{{ "{:,}".format(row.traffic) }}</td>
+                    <td>{{ row.share }}</td>
+                    <td>{{ row.count }}</td>
+                    <td>{{ row.note }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>1.2 TOP20 流量来源</h2>
+
+        {% if charts.top20_sources %}
+        <div class="chart-container">
+            <img src="{{ charts.top20_sources }}" alt="TOP20流量来源">
+            <div class="caption">图2：TOP20流量来源（绿色=增长，红色=下降）</div>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>来源</th>
+                    <th>流量</th>
+                    <th>环比</th>
+                    <th>类型</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in top20_sources %}
+                <tr {% if row.highlight %}class="highlight"{% endif %}>
+                    <td>{{ loop.index }}</td>
+                    <td>{% if row.highlight %}<strong>{{ row.source }}</strong>{% else %}{{ row.source }}{% endif %}</td>
+                    <td>{{ "{:,}".format(row.traffic) }}</td>
+                    <td><span class="growth {{ 'positive' if row.growth > 0 else 'negative' }}">{% if row.growth > 0 %}+{% endif %}{{ "%.1f"|format(row.growth * 100) }}%</span></td>
+                    <td>{{ row.type }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="page-break"></div>
+
+        <h1>二、AI工具赛道深度分析</h1>
+
+        <h2>2.1 AI工具流量排行榜</h2>
+
+        {% if charts.ai_tools %}
+        <div class="chart-container">
+            <img src="{{ charts.ai_tools }}" alt="AI工具流量对比">
+            <div class="caption">图3：AI工具流量TOP20</div>
+        </div>
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>产品</th>
+                    <th>细分赛道</th>
+                    <th>流量</th>
+                    <th>环比</th>
+                    <th>评级</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in ai_tools_ranking %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.tool }}</td>
+                    <td>{{ row.category }}</td>
+                    <td>{{ "{:,}".format(row.traffic) }}</td>
+                    <td><span class="growth {{ 'positive' if row.growth > 0 else 'negative' }}">{% if row.growth > 0 %}+{% endif %}{{ "%.1f"|format(row.growth * 100) }}%</span></td>
+                    <td><span class="rating {{ row.rating_class }}">{{ row.rating }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>2.2 赛道格局分析</h2>
+
+        {% for track in track_analysis %}
+        <h3>{{ track.name }}</h3>
+        <div class="code-block">{{ track.data }}</div>
+        <div class="key-points">
+            <strong>分析观点：</strong>{{ track.insight }}
+        </div>
+        {% endfor %}
+
+        <div class="page-break"></div>
+
+        <h1>三、机会赛道与标的</h1>
+
+        <h2>3.1 高增长机会矩阵</h2>
+
+        {% if charts.opportunities %}
+        <div class="chart-container">
+            <img src="{{ charts.opportunities }}" alt="高增长机会标的">
+            <div class="caption">图4：高增长机会标的</div>
+        </div>
+        {% endif %}
+
+        {% if charts.growth_quadrant %}
+        <div class="chart-container">
+            <img src="{{ charts.growth_quadrant }}" alt="增长机会象限">
+            <div class="caption">图5：流量规模 vs 增长率象限分析</div>
+        </div>
+        {% endif %}
+
+        <h2>3.2 重点推荐标的</h2>
+
+        <div class="recommendation">
+            <h3>S级推荐</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标的</th>
+                        <th>赛道</th>
+                        <th>流量</th>
+                        <th>增长率</th>
+                        <th>推荐理由</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in s_level_recommendations %}
+                    <tr>
+                        <td><strong>{{ item.name }}</strong></td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.traffic }}</td>
+                        <td><span class="growth positive">+{{ "%.1f"|format(item.growth * 100) }}%</span></td>
+                        <td>{{ item.reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 20px;">A级推荐</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标的</th>
+                        <th>赛道</th>
+                        <th>流量</th>
+                        <th>增长率</th>
+                        <th>推荐理由</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in a_level_recommendations %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.traffic }}</td>
+                        <td><span class="growth positive">+{{ "%.1f"|format(item.growth * 100) }}%</span></td>
+                        <td>{{ item.reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="page-break"></div>
+
+        <h1>四、风险提示</h1>
+
+        <div class="risk-warning">
+            <h4>下行风险标的</h4>
+            <p>以下产品出现持续负增长，建议关注其竞争格局变化：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>产品</th>
+                        <th>流量</th>
+                        <th>环比</th>
+                        <th>风险等级</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in risk_items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ "{:,}".format(item.traffic) }}</td>
+                        <td><span class="growth negative">{{ "%.1f"|format(item.growth * 100) }}%</span></td>
+                        <td><span class="rating risk">{{ item.risk_level }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h2>数据局限性说明</h2>
+        <ul>
+            {% for caveat in data_caveats %}
+            <li>{{ caveat }}</li>
+            {% endfor %}
+        </ul>
+
+        <h1>五、配置方向参考</h1>
+
+        <div class="recommendation">
+            <h3>重点关注赛道</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>优先级</th>
+                        <th>赛道</th>
+                        <th>代表标的</th>
+                        <th>逻辑</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for track in focus_tracks %}
+                    <tr>
+                        <td>{{ track.priority }}</td>
+                        <td>{{ track.name }}</td>
+                        <td>{{ track.examples }}</td>
+                        <td>{{ track.logic }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-box">
+            <h3>核心结论</h3>
+            <ol>
+                {% for conclusion in conclusions %}
+                <li><strong>{{ conclusion.title }}</strong>{{ conclusion.description }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <div class="disclaimer">
+            <strong>重要声明：</strong>{{ disclaimer }}
+        </div>
+    </div>
+</body>
+</html>
