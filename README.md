@@ -79,15 +79,23 @@ npx skills add jueyunai/zhiyun-skills
 直接用自然语言告诉 Claude：
 
 ```
-帮我分析这个流量数据 data.csv
+分析这份 Stripe 流量数据，找出增长最快的 AI 工具
 ```
 
 ```
-找出高增长的 AI 编程工具，生成研究报告
+对比 Cursor、Lovable、Bolt 的流量表现，生成竞品分析报告
 ```
 
 ```
-对比 Cursor、Windsurf、Lovable 的流量表现
+筛选流量 50万+ 且增长超过 30% 的产品，按赛道分类
+```
+
+```
+AI Agent 赛道表现怎么样？Manus 和 Devin 谁更强？
+```
+
+```
+生成一份专业的 PDF 研究报告，包含流量分布图和增长象限图
 ```
 
 ### 核心功能
